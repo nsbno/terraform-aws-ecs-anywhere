@@ -59,6 +59,10 @@ locals {
         "awslogs-stream-prefix" : "container"
       }
     }
+    portMappings = [for mapping in var.task_port_mappings : {
+      containerPort = mapping.container
+      hostPort      = mapping.host
+    }]
     command     = var.task_container_command
     healthCheck = var.task_container_health_check
     environment = local.task_environment
