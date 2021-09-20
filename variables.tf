@@ -24,6 +24,15 @@ variable "task_container_image" {
   type        = string
 }
 
+variable "task_port_mappings" {
+  description = "An optional list of container ports to expose on the external host."
+  type = list(object({
+    host      = number
+    container = number
+  }))
+  default = []
+}
+
 variable "desired_count" {
   description = "The number of instances of the task definitions to place and keep running."
   default     = 1
