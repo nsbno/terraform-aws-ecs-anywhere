@@ -112,3 +112,37 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ecs_cluster" {
+  description = "the cluster to deploy to"
+}
+
+variable "pager_duty_critical_endpoint" {
+  description = "The PagerDuty endpoint where to subscribe CRITICAL alarms."
+  type        = string
+}
+
+variable "pager_duty_degraded_endpoint" {
+  description = "The PagerDuty endpoint where to subscribe DEGRADED alarms."
+  type        = string
+}
+
+variable "service_alarm_cpu_evaluation_periods" {
+  description = "number of evaluation periods before triggering alarm"
+  default     = 5
+}
+
+variable "service_alarm_latency_threshold" {
+  description = "Alarm threshold for high latency (milliseconds)"
+  default     = 2000
+}
+
+variable "service_alarm_memory_threshold" {
+  description = "Alarm threshold for High memory usage (percent)"
+  default     = 80
+}
+
+variable "service_alarm_cpu_threshold" {
+  description = "Alarm threshold for High CPU usage (percent)"
+  default     = 80
+}

@@ -103,3 +103,98 @@ resource "aws_ecs_service" "this" {
   }
   tags = var.tags
 }
+
+############################################################################################
+# Configure Alarm SNS topics for ECS Anywhere
+############################################################################################
+# Alarm SNS topic for alarms on level DEGRADED.
+resource "aws_sns_topic" "degraded_alarms" {
+  name = "${var.name_prefix}-ecsanywhere-degraded-alarms"
+  tags = var.tags
+}
+
+# Alarm SNS topic for alarms on level CRITICAL
+resource "aws_sns_topic" "critical_alarms" {
+  name = "${var.name_prefix}-ecsanywhere-critical-alarms"
+  tags = var.tags
+}
+
+############################################################################################
+# Integrate Cloudwatch Alarms to Pagerduty via SNS topics.
+############################################################################################
+# Subscribe Critical alarms to PagerDuty
+resource "aws_sns_topic_subscription" "critical_alarms_to_pagerduty" {
+  endpoint               = var.pager_duty_critical_endpoint
+  protocol               = "https"
+  endpoint_auto_confirms = true
+  topic_arn              = aws_sns_topic.critical_alarms.arn
+}
+
+# Subscribe Degraded alarms to PagerDuty
+resource "aws_sns_topic_subscription" "degraded_alarms_to_pagerduty" {
+  endpoint               = var.pager_duty_degraded_endpoint
+  protocol               = "https"
+  endpoint_auto_confirms = true
+  topic_arn              = aws_sns_topic.degraded_alarms.arn
+}
+
+############################################################################################
+# Configure Default Cloudwatch Alarms for service
+############################################################################################
+resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
+  metric_name         = "CPUUtilization"
+  alarm_name          = "${var.name_prefix}-ecsanywhere-cpu"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = var.service_alarm_cpu_evaluation_periods
+  threshold           = var.service_alarm_cpu_threshold
+  namespace           = "AWS/ECS"
+  dimensions = {
+    ClusterName = var.ecs_cluster.name
+    ServiceName = "${var.name_prefix}"
+  }
+  period            = 60
+  statistic         = "Average"
+  alarm_description = "${var.name_prefix}-ecsanywhere has crossed the CPU usage treshold"
+  tags              = var.tags
+  alarm_actions     = [aws_sns_topic.degraded_alarms.arn]
+  ok_actions        = [aws_sns_topic.degraded_alarms.arn]
+}
+
+resource "aws_cloudwatch_metric_alarm" "high_memory_utilization" {
+  metric_name         = "MemoryUtilization"
+  alarm_name          = "${var.name_prefix}-ecsanywhere-memory"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 5
+  threshold           = var.service_alarm_memory_threshold
+  namespace           = "AWS/ECS"
+  dimensions = {
+    ClusterName = var.ecs_cluster.name
+    ServiceName = "${var.name_prefix}"
+  }
+  period            = 60
+  statistic         = "Average"
+  alarm_description = "${var.name_prefix}-ecsanywhere has crossed the memory usage treshold"
+  tags              = var.tags
+  alarm_actions     = [aws_sns_topic.degraded_alarms.arn]
+  ok_actions        = [aws_sns_topic.degraded_alarms.arn]
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "num_error_logs" {
+  metric_name         = "logback.events.count"
+  alarm_name          = "${var.name_prefix}-ecsanywhere-errors-log"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  threshold           = 50
+  namespace           = "${var.name_prefix}"
+  dimensions = {
+    level = "error"
+  }
+  period             = 60
+  statistic          = "Sum"
+  alarm_description  = "${var.name_prefix}-ecsanywhere has logged to many errors"
+  tags               = var.tags
+  alarm_actions      = [aws_sns_topic.degraded_alarms.arn]
+  ok_actions         = [aws_sns_topic.degraded_alarms.arn]
+  treat_missing_data = "notBreaching"
+}
