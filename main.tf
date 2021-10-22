@@ -124,6 +124,7 @@ resource "aws_sns_topic" "critical_alarms" {
 ############################################################################################
 # Subscribe Critical alarms to PagerDuty
 resource "aws_sns_topic_subscription" "critical_alarms_to_pagerduty" {
+  count                  = length(var.pager_duty_critical_endpoint) > 0 ? 1 : 0
   endpoint               = var.pager_duty_critical_endpoint
   protocol               = "https"
   endpoint_auto_confirms = true
@@ -132,6 +133,7 @@ resource "aws_sns_topic_subscription" "critical_alarms_to_pagerduty" {
 
 # Subscribe Degraded alarms to PagerDuty
 resource "aws_sns_topic_subscription" "degraded_alarms_to_pagerduty" {
+  count                  = length(var.pager_duty_degraded_endpoint) > 0 ? 1 : 0
   endpoint               = var.pager_duty_degraded_endpoint
   protocol               = "https"
   endpoint_auto_confirms = true
@@ -186,7 +188,7 @@ resource "aws_cloudwatch_metric_alarm" "num_error_logs" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 50
-  namespace           = "${var.name_prefix}"
+  namespace           = var.name_prefix
   dimensions = {
     level = "error"
   }

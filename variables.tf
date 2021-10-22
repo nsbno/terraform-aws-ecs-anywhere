@@ -121,11 +121,13 @@ variable "tags" {
 variable "pager_duty_critical_endpoint" {
   description = "The PagerDuty endpoint where to subscribe CRITICAL alarms."
   type        = string
+  default     = ""
 }
 
 variable "pager_duty_degraded_endpoint" {
   description = "The PagerDuty endpoint where to subscribe DEGRADED alarms."
   type        = string
+  default     = ""
 }
 
 variable "service_alarm_cpu_evaluation_periods" {
