@@ -14,6 +14,11 @@ variable "cluster_arn" {
   type        = string
 }
 
+variable "cluster_name" {
+  description = "The Name of the ECS cluster to create the ECS service in."
+  type        = string
+}
+
 variable "task_placement_constraints" {
   description = "A list of placement constraints to apply to the ECS task."
   default     = []
@@ -111,10 +116,6 @@ variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
   type        = map(string)
   default     = {}
-}
-
-variable "ecs_cluster" {
-  description = "the cluster to deploy to"
 }
 
 variable "pager_duty_critical_endpoint" {
