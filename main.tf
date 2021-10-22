@@ -149,7 +149,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   threshold           = var.service_alarm_cpu_threshold
   namespace           = "AWS/ECS"
   dimensions = {
-    ClusterName = var.ecs_cluster.name
+    ClusterName = var.cluster_name
     ServiceName = "${var.name_prefix}"
   }
   period            = 60
