@@ -109,13 +109,13 @@ resource "aws_ecs_service" "this" {
 ############################################################################################
 # Alarm SNS topic for alarms on level DEGRADED.
 resource "aws_sns_topic" "degraded_alarms" {
-  name = "${var.name_prefix}-ecsanywhere-degraded-alarms"
+  name = "${var.name_prefix}-ecs-anywhere-degraded-alarms"
   tags = var.tags
 }
 
 # Alarm SNS topic for alarms on level CRITICAL
 resource "aws_sns_topic" "critical_alarms" {
-  name = "${var.name_prefix}-ecsanywhere-critical-alarms"
+  name = "${var.name_prefix}-ecs-anywhere-critical-alarms"
   tags = var.tags
 }
 
@@ -143,7 +143,7 @@ resource "aws_sns_topic_subscription" "degraded_alarms_to_pagerduty" {
 ############################################################################################
 resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   metric_name         = "CPUUtilization"
-  alarm_name          = "${var.name_prefix}-ecsanywhere-cpu"
+  alarm_name          = "${var.name_prefix}-ecs-anywhere-cpu"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = var.service_alarm_cpu_evaluation_periods
   threshold           = var.service_alarm_cpu_threshold
@@ -154,7 +154,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   }
   period            = 60
   statistic         = "Average"
-  alarm_description = "${var.name_prefix}-ecsanywhere has crossed the CPU usage treshold"
+  alarm_description = "${var.name_prefix}-ecs-anywhere has crossed the CPU usage threshold"
   tags              = var.tags
   alarm_actions     = [aws_sns_topic.degraded_alarms.arn]
   ok_actions        = [aws_sns_topic.degraded_alarms.arn]
@@ -162,7 +162,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
 
 resource "aws_cloudwatch_metric_alarm" "high_memory_utilization" {
   metric_name         = "MemoryUtilization"
-  alarm_name          = "${var.name_prefix}-ecsanywhere-memory"
+  alarm_name          = "${var.name_prefix}-ecs-anywhere-memory"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 5
   threshold           = var.service_alarm_memory_threshold
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_metric_alarm" "high_memory_utilization" {
   }
   period            = 60
   statistic         = "Average"
-  alarm_description = "${var.name_prefix}-ecsanywhere has crossed the memory usage treshold"
+  alarm_description = "${var.name_prefix}-ecs-anywhere has crossed the memory usage threshold"
   tags              = var.tags
   alarm_actions     = [aws_sns_topic.degraded_alarms.arn]
   ok_actions        = [aws_sns_topic.degraded_alarms.arn]
@@ -182,7 +182,7 @@ resource "aws_cloudwatch_metric_alarm" "high_memory_utilization" {
 
 resource "aws_cloudwatch_metric_alarm" "num_error_logs" {
   metric_name         = "logback.events.count"
-  alarm_name          = "${var.name_prefix}-ecsanywhere-errors-log"
+  alarm_name          = "${var.name_prefix}-ecs-anywhere-errors-log"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 50
@@ -192,7 +192,7 @@ resource "aws_cloudwatch_metric_alarm" "num_error_logs" {
   }
   period             = 60
   statistic          = "Sum"
-  alarm_description  = "${var.name_prefix}-ecsanywhere has logged to many errors"
+  alarm_description  = "${var.name_prefix}-ecs-anywhere has logged to many errors"
   tags               = var.tags
   alarm_actions      = [aws_sns_topic.degraded_alarms.arn]
   ok_actions         = [aws_sns_topic.degraded_alarms.arn]
