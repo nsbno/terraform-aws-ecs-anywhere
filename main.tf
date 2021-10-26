@@ -198,3 +198,13 @@ resource "aws_cloudwatch_metric_alarm" "num_error_logs" {
   ok_actions         = [aws_sns_topic.degraded_alarms.arn]
   treat_missing_data = "notBreaching"
 }
+
+# Lambda subscriptions
+resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_access_log_subscription_lambda" {
+  count           = var.enable_elasticcloud == false ? 0 : 1
+  destination_arn = var.lambda_elasticcloud
+  filter_pattern  = ""
+  log_group_name  = aws_cloudwatch_log_group.this.name
+  name            = "ElasticsearchStream-${var.name_prefix}"
+  distribution    = "ByLogStream"
+}

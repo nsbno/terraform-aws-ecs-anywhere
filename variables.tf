@@ -146,3 +146,15 @@ variable "service_alarm_cpu_threshold" {
   description = "Alarm threshold for High CPU usage (percent)"
   default     = 80
 }
+
+variable "lambda_elasticcloud" {
+  description = "Lambda for sending logs to elastic cloud"
+  default     = ""
+}
+
+variable "enable_elasticcloud" {
+  description = "set to true to enable elastic cloud for this microservice"
+  default     = false
+  type        = bool
+}
+
