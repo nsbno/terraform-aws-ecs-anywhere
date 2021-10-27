@@ -14,6 +14,11 @@ variable "cluster_arn" {
   type        = string
 }
 
+variable "cluster_name" {
+  description = "The Name of the ECS cluster to create the ECS service in."
+  type        = string
+}
+
 variable "task_placement_constraints" {
   description = "A list of placement constraints to apply to the ECS task."
   default     = []
@@ -113,18 +118,16 @@ variable "tags" {
   default     = {}
 }
 
-variable "ecs_cluster" {
-  description = "the cluster to deploy to"
-}
-
 variable "pager_duty_critical_endpoint" {
   description = "The PagerDuty endpoint where to subscribe CRITICAL alarms."
   type        = string
+  default     = ""
 }
 
 variable "pager_duty_degraded_endpoint" {
   description = "The PagerDuty endpoint where to subscribe DEGRADED alarms."
   type        = string
+  default     = ""
 }
 
 variable "service_alarm_cpu_evaluation_periods" {
